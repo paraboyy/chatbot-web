@@ -13,6 +13,7 @@
         #message { width: calc(100% - 90px); padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
         button { padding: 10px; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; }
         button:hover { background-color: #0056b3; }
+        #messages { height: 300px; overflow-y: auto; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -23,10 +24,10 @@
         <button onclick="sendMessage()">Kirim</button>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
-        // Ambil user_unix dari localStorage jika ada
         let userUnix = localStorage.getItem('user_unix');
-        let firstMessageSent = false; // Untuk menandai pesan pertama kali yang dikirim
 
         // Fungsi untuk menampilkan pesan di UI
         function displayMessages(messages) {
@@ -34,7 +35,6 @@
             messagesDiv.innerHTML = ''; // Hapus semua pesan sebelum menampilkannya
 
             messages.forEach(msg => {
-                // Cek apakah msg dan msg.message ada dan tidak kosong atau hanya terdiri dari spasi
                 if (msg && msg.message && msg.message.trim() !== '') {
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'message ' + (msg.type === 'user' ? 'user' : 'cs');
@@ -42,16 +42,9 @@
                     messagesDiv.appendChild(messageDiv);
                 }
             });
-        }
 
-
-        // Fungsi untuk menampilkan pesan selamat datang
-        function welcomeMessage() {
-            const messagesDiv = document.getElementById('messages');
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'message cs';
-            welcomeDiv.innerText = "Selamat datang di website ISONER, ada yang bisa kami bantu.";
-            messagesDiv.appendChild(welcomeDiv);
+            // Scroll ke bawah setiap kali ada pesan baru
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
         // Fungsi untuk mengirim pesan
@@ -60,21 +53,17 @@
             const message = messageInput.value;
             messageInput.value = '';
 
-            if (!firstMessageSent) {
-                // Tampilkan pesan dari bot saat pesan pertama kali dikirim
-                const botMessageDiv = document.createElement('div');
-                botMessageDiv.className = 'message cs';
-                botMessageDiv.innerText = "Pesan anda akan kami kirim kepada CS, harap menunggu.";
-                document.getElementById('messages').appendChild(botMessageDiv);
-                firstMessageSent = true; // Tandai bahwa pesan pertama sudah dikirim
+            if (!message.trim()) {
+                return; // Jangan kirim jika pesan kosong
             }
 
-            // Tambahkan pesan pengguna
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'message user';
-            userMessageDiv.innerText = message;
-            document.getElementById('messages').appendChild(userMessageDiv);
+            const userMessage = {
+                type: 'user',
+                message: message,
+                date: new Date().toISOString()
+            };
 
+            // Kirim pesan ke server
             fetch('/send-message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
@@ -82,12 +71,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Simpan user_unix di localStorage
                 userUnix = data.user_unix;
                 localStorage.setItem('user_unix', userUnix);
-                
-                // Tampilkan pesan di UI
-                displayMessages(data.messages);
+
+                // Tampilkan pesan dari server jika ada
+                if (data.messages && data.messages.length) {
+                    displayMessages(data.messages);
+                }
             });
         }
 
@@ -100,16 +90,45 @@
             })
             .then(response => response.json())
             .then(data => {
-                displayMessages(data.messages);
+                if (data.messages && data.messages.length) {
+                    displayMessages(data.messages);
+                }
             });
         }
 
-        // Ambil pesan sebelumnya ketika halaman dimuat ulang
+        // Polling balasan dari CS setiap 3 detik
+        setInterval(function() {
+            if (userUnix) {
+                receiveCSReply();
+            }
+        }, 3000);
+
+        // Ambil pesan sebelumnya ketika halaman dimuat
         window.onload = function() {
             if (userUnix) {
-                welcomeMessage(); // Tampilkan pesan selamat datang saat halaman dimuat
-                receiveCSReply(); // Pastikan pesan user sebelumnya dimuat
+                fetch('/load-messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: JSON.stringify({ user_unix: userUnix })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages) {
+                        displayMessages(data.messages);
+                    }
+                });
+            } else {
+                welcomeMessage(); // Tampilkan pesan selamat datang saat pertama kali pengguna mengakses halaman
             }
+        }
+        
+        // Fungsi untuk menampilkan pesan selamat datang
+        function welcomeMessage() {
+            const messagesDiv = document.getElementById('messages');
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'message cs';
+            welcomeDiv.innerText = "Selamat datang di website ISONER, ada yang bisa kami bantu.";
+            messagesDiv.appendChild(welcomeDiv);
         }
     </script>
 </body>

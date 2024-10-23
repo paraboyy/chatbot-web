@@ -105,6 +105,24 @@
                 console.error('Error:', error);
             });
         }
+
+        // Fungsi untuk polling pesan dari user setiap 3 detik
+        function pollMessages() {
+            fetch('/cs')
+            .then(response => response.json())
+            .then(data => {
+                displayMessages(data.messages);
+            })
+            .catch(error => {
+                console.error('Error polling messages:', error);
+            });
+        }
+
+        // Jalankan polling setiap 3 detik
+        setInterval(pollMessages, 3000);
+
+        // Muat pesan pertama kali saat halaman dimuat
+        window.onload = pollMessages;
     </script>
 </body>
 </html>

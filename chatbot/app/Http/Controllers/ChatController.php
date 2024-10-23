@@ -9,54 +9,53 @@ class ChatController extends Controller
     // Menampilkan halaman chatbot
     public function index()
     {
-        return view('chat');
+        // Generate unique session id for the user
+        if (!Session::has('user_id')) {
+            Session::put('user_id', uniqid('user_', true));
+        }
+    
+        return view('chatbot');
     }
 
     // Menampilkan halaman customer service
-    public function service()
+    public function chat(Request $request)
     {
-        return view('service');
-    }
+        $userMessage = $request->input('message');
 
-    // Mengirim pesan dari pengguna
-    public function sendMessage(Request $request)
-    {
-        $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
-
-        // Simpan pesan di session
-        $messages = session()->get('messages', []);
-        $messages[] = [
-            'user' => 'User',
-            'message' => $request->input('message'),
+        // Mendapatkan token dari .env
+        $botToken = env('CHATBOT_TOKEN');
+    
+        // URL untuk mengirim pesan ke Telegram
+        $url = "https://api.telegram.org/bot$botToken/sendMessage";
+    
+        // Mempersiapkan data untuk dikirim ke Telegram
+        $data = [
+            'chat_id' => '1898296743', // Ganti dengan ID chat CS atau grup yang digunakan oleh CS
+            'text' => "Pesan dari pengguna: $userMessage", // Menambahkan informasi bahwa ini adalah pesan dari pengguna
         ];
-        session(['messages' => $messages]);
-
-        return redirect()->route('chat');
+    
+        // Mengirim permintaan POST ke API Telegram
+        $response = Http::post($url, $data);
+    
+        if ($response->successful()) {
+            return response()->json(['response' => "Pesan Anda telah dikirim ke customer service. Tunggu balasan dari CS."]);
+        } else {
+            return response()->json(['response' => 'Gagal mengirim pesan ke customer service.']);
+        }
     }
 
-    // Mengirim balasan dari customer service
-    public function replyMessage(Request $request)
-    {
-        $request->validate([
-            'reply' => 'required|string|max:255',
-        ]);
+    public function webook(Request $request) {
+        // Mengambil data yang dikirim oleh Telegram
+        $update = $request->input();
 
-        // Simpan balasan di session
-        $messages = session()->get('messages', []);
-        $messages[] = [
-            'user' => 'Customer Service',
-            'message' => $request->input('reply'),
-        ];
-        session(['messages' => $messages]);
+        // Mengecek apakah ada pesan baru dari CS
+        if (isset($update['message']) && isset($update['message']['text'])) {
+            $csMessage = $update['message']['text'];
 
-        return redirect()->route('service');
-    }
+            // Kirim pesan CS ke website
+            Session::flash('cs_response', $csMessage);
+        }
 
-    // Mendapatkan semua pesan
-    public function getMessages()
-    {
-        return session()->get('messages', []);
+        return response()->json(['status' => 'success']);
     }
 }
