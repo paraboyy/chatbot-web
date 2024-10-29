@@ -5,15 +5,17 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Chat\ChatbaruController;
 use App\Http\Controllers\ChatbotController;
 
 // Route::get('/', function () {
 //     return view('welcome');
-// });
+// });  
 
+Route::get('/', [ChatbaruController::class, 'index']);
 
 // CHATBOT AND CS TANPA TELEGRAM
-Route::get('/', [ChatbotController::class, 'index']);
+// Route::get('/', [ChatbotController::class, 'index']);
 Route::post('/send-message', [ChatbotController::class, 'sendMessage']);
 Route::post('/cs-reply', [ChatbotController::class, 'csReply']);
 Route::get('/cs', [ChatbotController::class, 'csView']);
