@@ -1,8 +1,12 @@
+body {
+    background-color: #f8f8fb;
+}
+
 #message { 
     width: calc(100% - 90px); 
     padding: 10px;
     border: 1px solid #ccc; 
-    border-radius: 5px; 
+    border-radius: 20px 0 0 20px; 
 }
 
 #messages { 
@@ -61,3 +65,46 @@
     background-color: #f8d7da; 
     text-align: left; 
 }
+
+.message-button {
+    display: flex;
+    align-items: center;
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    padding: 5px;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .message-button input.form-control {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 8px;
+    font-size: 16px;
+    outline: none;
+    border-radius: 20px 0 0 20px;
+  }
+  
+  .message-button button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .message-button button .arrow {
+    font-size: 18px;
+  }
+  
+  .message-button button:hover {
+    background-color: #d0d0d0;
+  }
+  

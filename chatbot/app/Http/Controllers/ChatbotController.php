@@ -37,6 +37,7 @@ class ChatbotController extends Controller
     // Halaman chat utama
     public function index() {
         $userUnix = session('user_unix', null);
+        // $userUnix = Session::getId();
         $messages = $this->readMessagesFromFile();
 
         return view('chat', [

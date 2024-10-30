@@ -10,8 +10,10 @@ class ChatbaruController extends Controller
 
     // Halaman chat utama
     public function index() {
-        $userUnix = session('user_unix', null);
+        //Membuat UserUnix untuk session
+        $userUnix = session('user_unix', uniqid('user_', true));
+        // $userUnix = session('user_unix', null);
 
-        return view('chat.chat');
+        return view('chat.chat', ['user_unix' => $userUnix]);
     }
 }
