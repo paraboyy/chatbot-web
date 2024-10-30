@@ -52,6 +52,7 @@ return [
     |
     */
 
+    // 'url' => env('APP_URL', 'http://scaling-fiesta-495q56xv67xhjwp5-8000.app.github.dev'),
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
