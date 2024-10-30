@@ -23,9 +23,12 @@
 
     <div class="dp-flex-center">
         <div class="message-button">
+            <button class="dokum" onclick="sendDocument()">
+                <span class="fw-bold">@</span>
+            </button>
             <input type="text" class="form-control" id="message" placeholder="Message Pengaduan" aria-label="Recipient's username" aria-describedby="button-addon2">
-            <button onclick="sendMessage()">
-                <span class="arrow">➔</span>
+            <button class="arrow" onclick="sendMessage()">
+                <span>➔</span>
             </button>
         </div>
 
@@ -97,13 +100,60 @@
                     const csResponse = "Anda telah diarahkan ke CS Layanan Pengaduan Rumah Sakit Balimed.";
                     displayMessage(csResponse, 'cs');
                 }, 1000); 
-            } else {
+            }else if (message === "2" || message === "2. Layanan Pengaduan Mahasiswa Udayana") {
+                setTimeout(() => {
+                    const csResponse = "Anda telah diarahkan ke CS Layanan Pengaduan Mahasiswa Udayana";
+                    displayMessage(csResponse, 'cs');
+                }, 1000); 
+            }else if (message === "3" || message === "3. Layanan Pengaduan Pemprov Bali") {
+                setTimeout(() => {
+                    const csResponse = "Anda telah diarahkan ke CS Layanan Pengaduan Mahasiswa Udayana";
+                    displayMessage(csResponse, 'cs');
+                }, 1000); 
+            }else if (message === "4" || message === "4. Layanan Pendaftaran UP mahasiswa TI") {
+                setTimeout(() => {
+                    const csResponse = "Anda telah diarahkan ke CS Layanan Pengaduan Mahasiswa Udayana";
+                    displayMessage(csResponse, 'cs');
+                }, 1000); 
+            }else {
                 setTimeout(() => {
                     const csReply = `Pilih Layanan:\n ${service.join('\n')}`;
                     displayMessage(csReply, 'cs');
                 }, 1000); 
             }
         }   
+
+        // Fungsi untuk mengirim dokumen ke backend
+        function sendDocument() {
+            const documentInput = document.getElementById('document');
+            const file = documentInput.files[0];
+            if (!file) {
+                alert("Pilih dokumen terlebih dahulu!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("document", file);
+            formData.append("_token", "{{ csrf_token() }}"); // Tambahkan CSRF token untuk keamanan
+
+            // Mengirim file menggunakan fetch
+            fetch("/upload-document", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayMessage("Dokumen berhasil diunggah!", "cs");
+                } else {
+                    displayMessage("Gagal mengunggah dokumen.", "cs");
+                }
+            })
+            .catch(error => {
+                displayMessage("Terjadi kesalahan saat mengunggah dokumen.", "cs");
+            });
+        }
+
 
         // Tampilkan pesan selamat datang saat halaman dimuat
         window.onload = function() {

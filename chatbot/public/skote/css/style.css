@@ -6,7 +6,7 @@ body {
     width: calc(100% - 90px); 
     padding: 10px;
     border: 1px solid #ccc; 
-    border-radius: 20px 0 0 20px; 
+    border-radius: 5px; 
 }
 
 #messages { 
@@ -93,11 +93,19 @@ body {
     background-color: #e0e0e0;
     color: #333;
     border: none;
-    border-radius: 0 20px 20px 0;
+    /* border-radius: 0 20px 20px 0; */
     padding: 8px 16px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
+  }
+
+  .arrow {
+    border-radius: 0 20px 20px 0;
+  }
+
+  .dokum {
+    border-radius: 20px 0px 0px 20px;
   }
   
   .message-button button .arrow {

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Chat\ChatbaruController;
+use App\Http\Controllers\Dokumen\DokumenController;
 use App\Http\Controllers\ChatbotController;
 
 // Route::get('/', function () {
@@ -13,6 +14,8 @@ use App\Http\Controllers\ChatbotController;
 // });  
 
 Route::get('/', [ChatbaruController::class, 'index']);
+Route::post('/upload-document', [DocumentController::class, 'uploadDocument']);
+
 
 // CHATBOT AND CS TANPA TELEGRAM
 // Route::get('/', [ChatbotController::class, 'index']);
