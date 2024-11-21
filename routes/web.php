@@ -14,6 +14,7 @@ use App\Http\Controllers\ChatbotController;
 // });  
 
 Route::get('/', [ChatbaruController::class, 'index']);
+Route::post('/chat/send', [ChatbaruController::class, 'store'])->name('chat.store');
 Route::post('/upload-document', [DocumentController::class, 'uploadDocument']);
 
 
