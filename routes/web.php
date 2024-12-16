@@ -8,12 +8,15 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Chat\ChatbaruController;
 use App\Http\Controllers\Dokumen\DokumenController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\Chat\PilihbotController;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });  
 
-Route::get('/', [ChatbaruController::class, 'index']);
+Route::get('/pilihbot', [PilihbotController::class, 'index']);
+
+Route::get('/', [ChatbaruController::class, 'index'])->name('chat.index');
 Route::post('/chat/send', [ChatbaruController::class, 'store'])->name('chat.store');
 Route::post('/upload-document', [DocumentController::class, 'uploadDocument']);
 

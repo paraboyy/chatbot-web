@@ -10,40 +10,44 @@
     <title>Chatbot Pengaduan</title>
 </head>
 <body>
-    <nav class="navbar bg-nav-home navbar-expand-lg space-between">
-        <div class="ms-4 my-2">
-            <img src="/skote/images/logo-dark.png" alt="ISONER" height="24">
-            <a class="text-dec fw-bold text-white" href="#">CHATBOT PENGADUAN</a>
+    <div class="sidebar shadow" id="sidebar">
+        <div class="ms-4 my-2 dp-flex mt-4">
+            <img src="/skote/images/logo-light.svg" alt="ISONER" height="24" class="mx-1">
+            <p class="text-decoration-none fw-bold d-block" href="#">CHATBOT PENGADUAN</p>
         </div>
-        <!-- Tombol hamburger untuk membuka/menutup sidebar -->
-        <button class="btn btn-link text-white" id="toggle-sidebar" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i> <!-- Icon hamburger -->
-        </button>
-    </nav>
-
-    <!-- Sidebar on the right -->
-    <div class="sidebar shadow">
-        <div class="new-chat" onclick="createNewChat()">Buat Chat Baru</div>
-        <div id="chat-list">
+        <div class="dp-flex-center">
+            <button class="new-chat w-70 rounded shadow p-2 text-center" onclick="createNewChat()">Buat Chat Baru</button>
+        </div>
+        <div id="chat-list" class="mt-3 p-3">
             <!-- List of chats will be displayed here -->
+            <p class="text-muted">Daftar chat akan muncul di sini.</p>
         </div>
     </div>
 
-    <!-- Main chat window -->
-    <div class="dp-flex-center mt-3" style="margin-left: 260px;">
-        <div id="messages" class="p-3 border rounded shadow"></div>
-    </div>
-
-    <div class="dp-flex-center mt-3">
-        <div class="message-button shadow d-flex align-items-center w-70" style="margin-left: 260px;">
-            <button class="dokum btn btn-secondary me-2" onclick="sendDocument()">
-                <span class="fw-bold">@</span>
+    <div class="content" id="content">
+        <nav class="navbar">
+            <button class="btn btn-link text-gray" id="toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
             </button>
-            <input type="text" class="form-control" id="message" placeholder="Message Pengaduan" aria-label="Recipient's username">
-            <button class="btn btn-primary ms-2" onclick="sendMessage()">Kirim</button>
+            <a class="p-2 fw-bold">CHATBOT PENGADUAN</a>
+        </nav>
+
+        <div class="dp-flex-center mt-3">
+            <div id="messages" class="p-3 border rounded shadow"></div>
+        </div>
+
+        <div class="dp-flex-center mt-3">
+            <div class="message-button shadow d-flex align-items-center w-70 mx-3">
+                <button class="dokum btn btn-secondary me-2" onclick="sendDocument()">
+                    <span class="fw-bold">@</span>
+                </button>
+                <input type="text" class="form-control" id="message" placeholder="Message Pengaduan" aria-label="Recipient's username">
+                <button class="btn btn-primary ms-2" onclick="sendMessage()">Kirim</button>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
@@ -52,6 +56,14 @@
         localStorage.setItem('ID_Unix', userUnix);
         let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || []; // Load from localStorage
         let currentChatId = null; // Track current chat
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+
+            sidebar.classList.toggle('closed');
+            content.classList.toggle('full-width');
+        }
 
         // Display the messages in the selected chat
         function displayMessage(message, type) {
@@ -141,16 +153,17 @@
 
         // Create new chat
         function createNewChat() {
-            const newChat = {
-                id: Date.now(),
-                name: `Chat ${chatHistory.length + 1}`,
-                messages: []
-            };
-            chatHistory.push(newChat); // Add to history
-            currentChatId = chatHistory.length - 1; // Set the current chat
-            saveChatHistory(); // Save to localStorage
-            updateChatList(); // Update the sidebar
-            loadChat(currentChatId); // Load the new chat window
+            window.location.href = "/pilihbot";
+            // const newChat = {
+            //     id: Date.now(),
+            //     name: `Chat ${chatHistory.length + 1}`,
+            //     messages: []
+            // };
+            // chatHistory.push(newChat); // Add to history
+            // currentChatId = chatHistory.length - 1; // Set the current chat
+            // saveChatHistory(); // Save to localStorage
+            // updateChatList(); // Update the sidebar
+            // loadChat(currentChatId); // Load the new chat window
         }
 
         // Save chat history to localStorage
@@ -179,6 +192,8 @@
             const chatListDiv = document.getElementById('chat-list');
             chatListDiv.innerHTML = ''; // Clear current list
 
+            const sortedChats = chatHistory.sort((a, b) => b.id - a.id);
+
             chatHistory.forEach((chat, index) => {
                 const chatContainer = document.createElement('div');
                 chatContainer.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'chat-item-container');
@@ -186,7 +201,7 @@
                 const chatLink = document.createElement('a');
                 chatLink.href = '#';
                 chatLink.innerText = chat.name || `Chat ${index + 1}`;  // Default name if not set
-                chatLink.classList.add('chat-item');
+                chatLink.classList.add('chat-item', 'text-gray');
                 if (index === currentChatId) {
                     chatLink.classList.add('active-chat');
                 }
@@ -198,7 +213,7 @@
                 const optionsMenu = document.createElement('div');
                 optionsMenu.classList.add('dropdown');
                 const optionsButton = document.createElement('button');
-                optionsButton.classList.add('btn', 'btn-sm', 'btn-link');
+                optionsButton.classList.add('btn', 'btn-sm', 'btn-link', 'text-light');
                 optionsButton.setAttribute('type', 'button');
                 optionsButton.setAttribute('data-bs-toggle', 'dropdown');
                 optionsButton.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
@@ -217,27 +232,68 @@
             });
         }
 
-        // Edit chat name
+        // Function to edit chat name using SweetAlert
         function editChatName(chatId) {
-            const newName = prompt('Enter new chat name:', chatHistory[chatId].name);
-            if (newName) {
-                chatHistory[chatId].name = newName;
-                saveChatHistory();
-                updateChatList();
-            }
+            const currentName = chatHistory[chatId].name;
+
+            Swal.fire({
+                title: 'Edit Nama Chat',
+                input: 'text',
+                inputValue: currentName,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Nama chat tidak boleh kosong!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newName = result.value; // Get the new name from the input
+                    if (newName !== currentName) {
+                        chatHistory[chatId].name = newName;
+                        saveChatHistory();
+                        updateChatList(); // Update the chat list after the name is changed
+
+                        // Show success alert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Nama Chat Diperbarui',
+                            text: `Nama chat telah diubah menjadi ${newName}.`,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
         }
 
         // Function to delete chat
         function deleteChat(chatId) {
-            if (confirm("Are you sure you want to delete this chat?")) {
-                chatHistory.splice(chatId, 1); // Remove the chat from the history
-                saveChatHistory(); // Save updated chat history
-                if (currentChatId === chatId) {
-                    currentChatId = null; // Reset current chat if the deleted one was active
-                    document.getElementById('messages').innerHTML = ''; // Clear messages
+            Swal.fire({
+                title: 'Hapus Chat?',
+                text: "Chat ini akan dihapus dan tidak dapat dipulihkan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Hapus Chat',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    chatHistory.splice(chatId, 1);
+                    saveChatHistory();
+                    if (currentChatId === chatId) {
+                        currentChatId = null; // Reset current chat if the deleted one was active
+                        document.getElementById('messages').innerHTML = ''; // Clear messages
+                    }
+                    updateChatList(); // Update the chat list in the sidebar
+
+                    Swal.fire(
+                        'Deleted!',
+                        'Chat telah dihapus.',
+                        'success'
+                    );
                 }
-                updateChatList(); // Update the chat list in the sidebar
-            }
+            });
         }
 
         // Initialize the page
@@ -279,10 +335,10 @@
             fileInput.click();
         };
 
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open'); // Menambahkan/menyembunyikan class "open"
-        }
+        // function toggleSidebar() {
+        //     const sidebar = document.querySelector('.sidebar');
+        //     sidebar.classList.toggle('open'); // Menambahkan/menyembunyikan class "open"
+        // }
     </script>
 </body>
 </html>
